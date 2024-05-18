@@ -1,7 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
-const Blog = require("./models/blog");
+const blogRoutes = require("./routes/blogsRoutes");
 
 //express app
 const app = express();
@@ -39,118 +39,8 @@ app.get("/about", (req, res) => {
 });
 
 //these are the blog routes
-app.get("/blogs", (req, res) => {
-  Blog.find()
-    .sort({ createdAt: -1 })
-    .then((result) => {
-      res.render("index", { title: "All Blogs", blogs: result });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-});
+app.use("/blogs", blogRoutes);
 
-app.post("/blogs", (req, res) => {
-  console.log(req.body);
-  const blog = new Blog(req.body);
-  blog
-    .save()
-    .then((result) => {
-      res.redirect("/blogs");
-    })
-    .catch((err) => {
-      console.error(err);
-    });
-});
-
-app.delete("/blogs/:id", (req, res) => {
-  const id = req.params.id;
-  Blog.findByIdAndDelete(id)
-    .then((result) => {
-      res.json({ redirect: "/blogs" });
-    })
-    .catch((err) => {
-      console.error(err);
-    });
-});
-app.put("/Blog/create/:id", (req, res) => {
-  const id = req.params.id;
-  console.log("update this blog: " + id);
-  Blog.findByIdAndUpdate(id)
-    .then((result) => {
-      res.json({ redirect: "/blogs" });
-    })
-    .catch((err) => {
-      console.error(err);
-    });
-});
-
-app.get("/blogs/create", (req, res) => {
-  res.render("create", { title: "create a new Blog" });
-});
-
-app.get("/blogs/:id", (req, res) => {
-  const id = req.params.id;
-  Blog.findById(id)
-    .then((result) => {
-      res.render("details", { blog: result, title: "Blog Details" });
-    })
-    .catch((err) => {
-      console.error(err);
-    });
-});
-
-//404 page
 app.use((req, res) => {
   res.status(404).render("404", { title: "404" });
 });
-
-
-
-// skipping this app.use method by using using next and calling it in the use method
-// app.use((req, res, next) => {
-//   console.log("new request made: ");
-//   console.log("host:", req.hostname);`
-//   console.log("path:", req.path);
-//   console.log("Method:", req.method);
-//   next();
-// });
-
-// //adding a blog to the database
-// app.get("/add-blog", (req, res) => {
-//   const blog = new Blog({
-//     title: "New Blog",
-//     snippet: "About my new blog",
-//     body: "this is about my new blog"
-//   });
-//   blog
-//     .save()
-//     .then((result) => {
-//       res.send(result);
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// });
-
-// //getting all blogs from the database
-// app.get("/get-all", (req, res) => {
-//   Blog.find()
-//     .then((result) => {
-//       res.send(result);
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// });
-
-// //finding  a single blog from the database
-// app.get("/find-one", (req, res) => {
-//   Blog.findById("66301bdba8dba376e5dd0525")
-//     .then((result) => {
-//       res.send(result);
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//     });
-// });

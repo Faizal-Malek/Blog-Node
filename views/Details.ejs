@@ -10,13 +10,14 @@
         <p><%= blog.body %></p>
       </div>
       <a data-doc="<%=blog._id %>" class="Update">Update</a>
-      <a data-doc="/blogs/create/<%=blog._id %>" class="delete">Delete</a>
+      <a data-doc="<%=blog._id %>" class="delete">Delete</a>
     </div>
 
     <script>
       // delete blog
       const trashcan = document.querySelector("a.delete");
       trashcan.addEventListener("click", (e) => {
+        e.preventDefault();
         const endpoint = `/blogs/${trashcan.dataset.doc}`;
         fetch(endpoint, {
           method: "DELETE"
