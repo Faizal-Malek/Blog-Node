@@ -1,0 +1,52 @@
+<html lang="en">
+  <%- include('./Partials/head.ejs') %>
+
+  <body>
+    <%- include('./Partials/nav.ejs') %>
+
+    <div class="details content">
+      <h2><%= blog.title %></h2>
+      <div class="content">
+        <p><%= blog.body %></p>
+      </div>
+      <a data-doc="<%=blog._id %>" class="Update">Update</a>
+      <a data-doc="/blogs/create/<%=blog._id %>" class="delete">Delete</a>
+    </div>
+
+    <script>
+      // delete blog
+      const trashcan = document.querySelector("a.delete");
+      trashcan.addEventListener("click", (e) => {
+        const endpoint = `/blogs/${trashcan.dataset.doc}`;
+        fetch(endpoint, {
+          method: "DELETE"
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            window.location.href = data.redirect;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+
+      // update blog
+      const update = document.querySelector("a.Update");
+      update.addEventListener("click", (e) => {
+        console.log("We are about to update");
+        const endpoint = `/blogs/create/${update.dataset.doc}`;
+        fetch(endpoint, {
+          method: "PUT"
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            window.location.href = data.redirect;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+    </script>
+  </body>
+  <%- include('./Partials/footer.ejs') %>
+</html>
