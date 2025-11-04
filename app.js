@@ -10,11 +10,6 @@ const app = express();
 const dbURI =
   "mongodb+srv://netninja:test1234@nodeproject.62tovra.mongodb.net/NodeProject?retryWrites=true&w=majority&appName=NodeProject";
 
-mongoose
-  .connect(dbURI)
-  .then((result) => app.listen(3000))
-  .catch((err) => console.error(err));
-
 //register view engine
 app.set("view engine", "ejs");
 // app.set('views', 'myViews')//making a new folder as the ejs view
@@ -44,3 +39,20 @@ app.use("/blogs", blogRoutes);
 app.use((req, res) => {
   res.status(404).render("404", { title: "404" });
 });
+
+// Connect to MongoDB
+mongoose
+  .connect(dbURI)
+  .then((result) => {
+    console.log("Connected to MongoDB");
+    // Only start server if not in serverless environment
+    if (require.main === module) {
+      app.listen(3000, () => {
+        console.log("Server running on port 3000");
+      });
+    }
+  })
+  .catch((err) => console.error(err));
+
+// Export the app for serverless deployment
+module.exports = app;
