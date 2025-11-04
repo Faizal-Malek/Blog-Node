@@ -20,8 +20,9 @@ let appPath = null;
 for (const path of possiblePaths) {
   try {
     const module = require(path);
-    // Check if we got a server instance (has listening property) vs an app
+    // Check if we got a valid module
     if (module && typeof module === 'object') {
+      // Check if it's a server instance (has listening property)
       if (module.listening !== undefined) {
         // This is a server instance, not an app
         console.error(`Error: ${path} exports a server instance (called listen()). Please export the app instance instead.`);
@@ -34,10 +35,13 @@ for (const path of possiblePaths) {
         };
         break;
       }
-      app = module;
-      appPath = path;
-      console.log(`Successfully loaded Express app from ${path}`);
-      break;
+      // Check if it looks like an Express app (has use, get, post methods)
+      if (typeof module.use === 'function' && typeof module.get === 'function') {
+        app = module;
+        appPath = path;
+        console.log(`Successfully loaded Express app from ${path}`);
+        break;
+      }
     }
   } catch (err) {
     // Path doesn't exist or can't be loaded, try next one
