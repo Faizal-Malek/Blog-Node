@@ -67,7 +67,7 @@ const blogRoutes = require("./routes/blogsRoutes");
 const app = express();
 
 // Connection string of MongoDB
-const dbURI = "mongodb+srv://netninja:test1234@nodeproject.62tovra.mongodb.net/NodeProject?retryWrites=true&w=majority&appName=NodeProject";
+const dbURI = process.env.MONGODB_URI || "mongodb+srv://your-connection-string";
 
 // Connect to MongoDB (but don't start server here)
 mongoose
@@ -129,10 +129,18 @@ Or add it to your `package.json`:
 
 ## Environment Variables
 
-Make sure to set your MongoDB connection string and any other environment variables in Vercel's dashboard:
+This PR improves security by supporting environment variables for sensitive configuration. Make sure to set your MongoDB connection string and any other environment variables in Vercel's dashboard:
+
+### Required Environment Variables:
+- `MONGODB_URI` - Your MongoDB connection string (required for production)
+
+### Setting Environment Variables in Vercel:
 1. Go to your Vercel project settings
 2. Navigate to Environment Variables
-3. Add any sensitive configuration (database URLs, API keys, etc.)
+3. Add `MONGODB_URI` with your MongoDB connection string
+4. Add any other sensitive configuration (API keys, etc.)
+
+**Security Note:** The app now reads `MONGODB_URI` from environment variables first, falling back to a default connection string for local development. For production deployments on Vercel, always set `MONGODB_URI` as an environment variable and rotate any credentials that were previously hardcoded.
 
 ## Testing Locally
 

@@ -7,7 +7,7 @@ const blogRoutes = require("./routes/blogsRoutes");
 const app = express();
 
 //Connection string of MongoDB
-const dbURI =
+const dbURI = process.env.MONGODB_URI ||
   "mongodb+srv://netninja:test1234@nodeproject.62tovra.mongodb.net/NodeProject?retryWrites=true&w=majority&appName=NodeProject";
 
 // Connect to MongoDB

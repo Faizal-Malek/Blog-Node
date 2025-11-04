@@ -9,26 +9,23 @@ const serverless = require('serverless-http');
 
 let app;
 
+// Common locations where the Express app might be exported
+const appPaths = ['../app', '../server', '../src/app'];
+
 // Try to require the Express app from common locations
-try {
-  // Try app.js in the root (most common)
-  app = require('../app');
-  console.log('Loaded Express app from ../app');
-} catch (e) {
+for (const path of appPaths) {
   try {
-    // Try server.js in the root
-    app = require('../server');
-    console.log('Loaded Express app from ../server');
-  } catch (e2) {
-    try {
-      // Try src/app.js
-      app = require('../src/app');
-      console.log('Loaded Express app from ../src/app');
-    } catch (e3) {
-      console.error('Could not load Express app from any common location (../app, ../server, ../src/app)');
-      throw new Error('Express app not found. Please ensure your app exports the Express instance.');
-    }
+    app = require(path);
+    console.log(`Loaded Express app from ${path}`);
+    break;
+  } catch (e) {
+    // Continue to next path
   }
+}
+
+if (!app) {
+  console.error(`Could not load Express app from any common location: ${appPaths.join(', ')}`);
+  throw new Error('Express app not found. Please ensure your app exports the Express instance.');
 }
 
 // Wrap the Express app with serverless-http and export for Vercel
