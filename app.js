@@ -7,12 +7,13 @@ const blogRoutes = require("./routes/blogsRoutes");
 const app = express();
 
 //Connection string of MongoDB
-const dbURI =
+const dbURI = process.env.MONGODB_URI ||
   "mongodb+srv://netninja:test1234@nodeproject.62tovra.mongodb.net/NodeProject?retryWrites=true&w=majority&appName=NodeProject";
 
+// Connect to MongoDB
 mongoose
   .connect(dbURI)
-  .then((result) => app.listen(3000))
+  .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error(err));
 
 //register view engine
@@ -44,3 +45,11 @@ app.use("/blogs", blogRoutes);
 app.use((req, res) => {
   res.status(404).render("404", { title: "404" });
 });
+
+// Only start server if running directly (not in serverless environment)
+if (require.main === module) {
+  app.listen(3000, () => console.log('Server running on port 3000'));
+}
+
+// Export the app for Vercel serverless function
+module.exports = app;
