@@ -27,12 +27,16 @@ function loadApp() {
       // Some modules might export default or have an app property
       const appInstance = app.default || app.app || app;
       
-      if (appInstance && typeof appInstance === 'function') {
+      // Express apps are objects with use, listen, and other middleware methods
+      if (appInstance && typeof appInstance === 'object' && 
+          typeof appInstance.use === 'function' && 
+          typeof appInstance.listen === 'function') {
         console.log(`✓ Successfully loaded Express app from: ${path}`);
         return appInstance;
       }
     } catch (error) {
-      // Continue to next path if this one fails
+      // Log errors for debugging, but continue trying other paths
+      console.log(`Could not load from ${path}: ${error.message}`);
       continue;
     }
   }
