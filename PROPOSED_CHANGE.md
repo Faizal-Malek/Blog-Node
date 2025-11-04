@@ -23,65 +23,42 @@ This PR adds Vercel serverless adapter configuration to enable deployment of the
 
 ## Required Changes for Maintainers
 
-### Current Issue
-The current `app.js` file calls `app.listen()` directly within the mongoose connection callback:
+### Update: app.js has been modified
+The `app.js` file has been updated to export the app instance while maintaining local development compatibility. The changes include:
 
+1. **Mongoose connection moved to end**: The connection is now established after all middleware and routes are configured
+2. **Conditional server start**: The app only calls `listen()` when run directly (not when imported as a module)
+3. **App export**: The app is now exported for use by the serverless adapter
+
+The current structure:
 ```javascript
-mongoose
-  .connect(dbURI)
-  .then((result) => app.listen(3000))
-  .catch((err) => console.error(err));
-```
+// ... (Express app setup, middleware, routes)
 
-### Recommended Solution
-To make the app work with the serverless adapter, the app should be **exported** instead of calling `listen()`. Here are two approaches:
-
-#### Option 1: Export app directly and create separate server.js
-Modify `app.js` to export the app after mongoose connection setup:
-
-```javascript
-// At the end of app.js, remove the app.listen() call and add:
+// Connect to MongoDB
 mongoose
   .connect(dbURI)
   .then((result) => {
-    console.log('Connected to MongoDB');
-  })
-  .catch((err) => console.error(err));
-
-// Export the app for serverless
-module.exports = app;
-```
-
-Then create a new `server.js` for local development:
-
-```javascript
-const app = require('./app');
-const port = process.env.PORT || 3000;
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-```
-
-#### Option 2: Conditional export
-Modify `app.js` to conditionally export or listen based on environment:
-
-```javascript
-mongoose
-  .connect(dbURI)
-  .then((result) => {
-    console.log('Connected to MongoDB');
-    // Only listen if not in serverless environment
+    console.log("Connected to MongoDB");
+    // Only start server if not in serverless environment
     if (require.main === module) {
       app.listen(3000, () => {
-        console.log('Server running on port 3000');
+        console.log("Server running on port 3000");
       });
     }
   })
   .catch((err) => console.error(err));
 
+// Export the app for serverless deployment
 module.exports = app;
 ```
+
+### For Local Development
+The app works the same way as before:
+```bash
+npm start  # or node app.js
+```
+
+The server will listen on port 3000 as usual.
 
 ## Deployment Steps
 
