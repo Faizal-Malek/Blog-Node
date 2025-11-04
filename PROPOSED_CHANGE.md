@@ -62,18 +62,46 @@ The server will listen on port 3000 as usual.
 
 ## Deployment Steps
 
-1. Merge this PR
-2. Make the recommended changes to `app.js` (see above)
-3. Run `npm install` to install `serverless-http`
-4. Commit the changes
-5. Deploy or redeploy on Vercel
-6. Vercel will automatically install dependencies and run the serverless function
+1. Merge this PR (all necessary changes are included)
+2. Run `npm install` to install `serverless-http`
+3. **IMPORTANT**: Move the MongoDB connection string to environment variables (see Security section below)
+4. Deploy or redeploy on Vercel
+5. Vercel will automatically install dependencies and run the serverless function
+
+## Security Considerations
+
+### Critical: MongoDB Connection String
+The MongoDB connection string is currently hardcoded in `app.js` with credentials exposed:
+```javascript
+const dbURI = "mongodb+srv://netninja:test1234@nodeproject.62tovra.mongodb.net/...";
+```
+
+**This is a security vulnerability and must be addressed before deployment.**
+
+To fix this:
+1. Create a `.env` file locally (already in .gitignore):
+```
+MONGODB_URI=mongodb+srv://netninja:test1234@nodeproject.62tovra.mongodb.net/NodeProject?retryWrites=true&w=majority&appName=NodeProject
+```
+
+2. Update `app.js` to use environment variable:
+```javascript
+const dbURI = process.env.MONGODB_URI || "mongodb://localhost:27017/fallback";
+```
+
+3. Add the `MONGODB_URI` environment variable in Vercel dashboard:
+   - Go to Project Settings > Environment Variables
+   - Add `MONGODB_URI` with your connection string
+   - The value will be securely stored and not exposed in your code
 
 ## Environment Variables
 
-If your app uses environment variables (like MongoDB connection string), make sure to add them in the Vercel dashboard:
+Make sure to add all required environment variables in the Vercel dashboard:
 - Go to Project Settings > Environment Variables
-- Add all required variables (e.g., `MONGODB_URI`)
+- Add `MONGODB_URI` with your connection string (see Security section above)
+- Add any other environment variables your app needs
+
+**Do not commit sensitive credentials to your repository.**
 
 ## Testing Locally
 
@@ -87,7 +115,7 @@ vercel dev
 
 ## Notes
 
-- The MongoDB connection string is currently hardcoded in `app.js`. Consider moving it to an environment variable for security.
+- **Security**: The MongoDB connection string with credentials is currently hardcoded in `app.js`. This should be moved to environment variables before deployment (see Security Considerations section above).
 - Serverless functions have cold start times, so the first request after a period of inactivity may be slower.
 - Static files in the `public` directory will be served correctly through the Express middleware.
 - EJS views will work as expected since they're rendered server-side.

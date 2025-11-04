@@ -21,7 +21,7 @@ for (const path of possiblePaths) {
 
 if (!app) {
   // If no app is found, return a helpful error
-  module.exports = async (req, res) => {
+  module.exports = (req, res) => {
     res.status(500).json({
       error: 'Express app not found',
       message: 'Could not locate the Express app. Please ensure your app is exported from one of: app.js, server.js, src/app.js, or src/server.js',
