@@ -1,7 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
 const blogRoutes = require("./routes/blogsRoutes");
-const authRoutes = require("./routes/authRoutes");
 const { initDatabase } = require("./db");
 
 //express app

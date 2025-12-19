@@ -21,7 +21,6 @@ const blog_details = async (req, res) => {
   }
 
   try {
-    await query("INSERT INTO blog_views (blog_id) VALUES ($1)", [id]);
     const { rows } = await query(
       "SELECT id, title, snippet, body, created_at FROM blogs WHERE id = $1",
       [id]
@@ -31,23 +30,7 @@ const blog_details = async (req, res) => {
       return res.status(404).render("404", { title: "404" });
     }
 
-    const [{ rows: viewRows }, { rows: likeRows }] = await Promise.all([
-      query("SELECT COUNT(*)::int AS total FROM blog_views WHERE blog_id = $1", [
-        id
-      ]),
-      query("SELECT COUNT(*)::int AS total FROM blog_likes WHERE blog_id = $1", [
-        id
-      ])
-    ]);
-
-    return res.render("details", {
-      blog: rows[0],
-      title: "Blog Details",
-      stats: {
-        views: viewRows[0]?.total || 0,
-        likes: likeRows[0]?.total || 0
-      }
-    });
+    return res.render("details", { blog: rows[0], title: "Blog Details" });
   } catch (err) {
     console.error(err);
     return res.status(500).render("500", { title: "Server Error" });
@@ -79,32 +62,11 @@ const blog_delete = async (req, res) => {
   }
 
   try {
-    await query("DELETE FROM blog_likes WHERE blog_id = $1", [id]);
-    await query("DELETE FROM blog_views WHERE blog_id = $1", [id]);
     await query("DELETE FROM blogs WHERE id = $1", [id]);
     return res.json({ redirect: "/blogs" });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "Failed to delete blog." });
-  }
-};
-
-const blog_like_post = async (req, res) => {
-  const id = Number(req.params.id);
-  if (!Number.isInteger(id)) {
-    return res.status(400).json({ error: "Invalid blog id." });
-  }
-
-  try {
-    await query("INSERT INTO blog_likes (blog_id) VALUES ($1)", [id]);
-    const { rows } = await query(
-      "SELECT COUNT(*)::int AS total FROM blog_likes WHERE blog_id = $1",
-      [id]
-    );
-    return res.json({ likes: rows[0]?.total || 0 });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Failed to like blog." });
   }
 };
 
