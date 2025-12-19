@@ -1,27 +1,49 @@
 const { Pool } = require("@neondatabase/serverless");
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString =
+  process.env.DATABASE_URL ||
+  process.env.BlogPost_DATABASE_URL ||
+  process.env.BlogPost_POSTGRES_URL ||
+  process.env.POSTGRES_URL;
 const pool = connectionString ? new Pool({ connectionString }) : null;
 
 let initPromise;
 
 const initDatabase = () => {
   if (!connectionString) {
-    const error = new Error("Missing DATABASE_URL environment variable.");
+    const error = new Error(
+      "Missing DATABASE_URL/BlogPost_DATABASE_URL/BlogPost_POSTGRES_URL/POSTGRES_URL environment variable."
+    );
     console.error(error.message);
     return Promise.reject(error);
   }
 
   if (!initPromise) {
-    initPromise = pool.query(`
-      CREATE TABLE IF NOT EXISTS blogs (
-        id SERIAL PRIMARY KEY,
-        title TEXT NOT NULL,
-        snippet TEXT NOT NULL,
-        body TEXT NOT NULL,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `);
+    initPromise = (async () => {
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS blogs (
+          id SERIAL PRIMARY KEY,
+          title TEXT NOT NULL,
+          snippet TEXT NOT NULL,
+          body TEXT NOT NULL,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `);
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS blog_views (
+          id SERIAL PRIMARY KEY,
+          blog_id INTEGER NOT NULL REFERENCES blogs(id) ON DELETE CASCADE,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `);
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS blog_likes (
+          id SERIAL PRIMARY KEY,
+          blog_id INTEGER NOT NULL REFERENCES blogs(id) ON DELETE CASCADE,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `);
+    })();
   }
 
   return initPromise;

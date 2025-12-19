@@ -70,6 +70,21 @@ const blog_delete = async (req, res) => {
   }
 };
 
+const blog_like_post = async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) {
+    return res.status(400).json({ error: "Invalid blog id." });
+  }
+
+  try {
+    await query("INSERT INTO blog_likes (blog_id) VALUES ($1)", [id]);
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to like blog." });
+  }
+};
+
 module.exports = {
   blog_index,
   blog_details,
