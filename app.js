@@ -1,19 +1,21 @@
 const express = require("express");
 const morgan = require("morgan");
-const mongoose = require("mongoose");
 const blogRoutes = require("./routes/blogsRoutes");
+const { initDatabase } = require("./db");
 
 //express app
 const app = express();
 
-//Connection string of MongoDB
-const dbURI =
-  "mongodb+srv://netninja:test1234@nodeproject.62tovra.mongodb.net/NodeProject?retryWrites=true&w=majority&appName=NodeProject";
+const port = process.env.PORT || 3000;
 
-mongoose
-  .connect(dbURI)
-  .then((result) => app.listen(3000))
-  .catch((err) => console.error(err));
+if (require.main === module) {
+  initDatabase()
+    .then(() => app.listen(port))
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+}
 
 //register view engine
 app.set("view engine", "ejs");
@@ -44,3 +46,5 @@ app.use("/blogs", blogRoutes);
 app.use((req, res) => {
   res.status(404).render("404", { title: "404" });
 });
+
+module.exports = { app };
