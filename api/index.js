@@ -1,12 +1,19 @@
-const { app, connectToDatabase } = require("../app");
+const { app } = require("../app");
+const { initDatabase } = require("../db");
 
-let connectionPromise;
+let initPromise;
 
 module.exports = async (req, res) => {
-  if (!connectionPromise) {
-    connectionPromise = connectToDatabase();
-  }
+  try {
+    if (!initPromise) {
+      initPromise = initDatabase();
+    }
 
-  await connectionPromise;
-  return app(req, res);
+    await initPromise;
+    return app(req, res);
+  } catch (err) {
+    console.error(err);
+    res.statusCode = 500;
+    res.end("Database connection failed.");
+  }
 };

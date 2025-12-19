@@ -1,29 +1,20 @@
 const express = require("express");
 const morgan = require("morgan");
-const mongoose = require("mongoose");
 const blogRoutes = require("./routes/blogsRoutes");
+const { initDatabase } = require("./db");
 
 //express app
 const app = express();
 
 const port = process.env.PORT || 3000;
-const dbURI = process.env.MONGODB_URI;
-
-if (!dbURI) {
-  console.error("Missing MONGODB_URI environment variable.");
-  process.exit(1);
-}
-
-const connectToDatabase = () =>
-  mongoose.connect(dbURI).catch((err) => {
-    console.error(err);
-    throw err;
-  });
 
 if (require.main === module) {
-  connectToDatabase()
+  initDatabase()
     .then(() => app.listen(port))
-    .catch(() => process.exit(1));
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
 }
 
 //register view engine
@@ -56,4 +47,4 @@ app.use((req, res) => {
   res.status(404).render("404", { title: "404" });
 });
 
-module.exports = { app, connectToDatabase };
+module.exports = { app };
