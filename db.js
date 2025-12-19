@@ -13,15 +13,31 @@ const initDatabase = () => {
   }
 
   if (!initPromise) {
-    initPromise = pool.query(`
-      CREATE TABLE IF NOT EXISTS blogs (
-        id SERIAL PRIMARY KEY,
-        title TEXT NOT NULL,
-        snippet TEXT NOT NULL,
-        body TEXT NOT NULL,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-      )
-    `);
+    initPromise = (async () => {
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS blogs (
+          id SERIAL PRIMARY KEY,
+          title TEXT NOT NULL,
+          snippet TEXT NOT NULL,
+          body TEXT NOT NULL,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `);
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS blog_views (
+          id SERIAL PRIMARY KEY,
+          blog_id INTEGER NOT NULL REFERENCES blogs(id) ON DELETE CASCADE,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `);
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS blog_likes (
+          id SERIAL PRIMARY KEY,
+          blog_id INTEGER NOT NULL REFERENCES blogs(id) ON DELETE CASCADE,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+      `);
+    })();
   }
 
   return initPromise;
