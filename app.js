@@ -6,13 +6,17 @@ const blogRoutes = require("./routes/blogsRoutes");
 //express app
 const app = express();
 
-//Connection string of MongoDB
-const dbURI =
-  "mongodb+srv://netninja:test1234@nodeproject.62tovra.mongodb.net/NodeProject?retryWrites=true&w=majority&appName=NodeProject";
+const port = process.env.PORT || 3000;
+const dbURI = process.env.MONGODB_URI;
+
+if (!dbURI) {
+  console.error("Missing MONGODB_URI environment variable.");
+  process.exit(1);
+}
 
 mongoose
   .connect(dbURI)
-  .then((result) => app.listen(3000))
+  .then(() => app.listen(port))
   .catch((err) => console.error(err));
 
 //register view engine
