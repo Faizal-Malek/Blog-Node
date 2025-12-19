@@ -10,7 +10,7 @@ const blog_index = async (req, res) => {
     res.render("index", { title: "All Blogs", blogs: rows });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Failed to load blogs.");
+    res.status(500).render("500", { title: "Server Error" });
   }
 };
 
@@ -33,7 +33,7 @@ const blog_details = async (req, res) => {
     return res.render("details", { blog: rows[0], title: "Blog Details" });
   } catch (err) {
     console.error(err);
-    return res.status(500).send("Failed to load blog.");
+    return res.status(500).render("500", { title: "Server Error" });
   }
 };
 
@@ -51,7 +51,7 @@ const blog_create_post = async (req, res) => {
     res.redirect("/blogs");
   } catch (err) {
     console.error(err);
-    res.status(500).send("Failed to create blog.");
+    res.status(500).render("500", { title: "Server Error" });
   }
 };
 

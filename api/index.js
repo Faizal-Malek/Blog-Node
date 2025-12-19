@@ -14,6 +14,7 @@ module.exports = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.statusCode = 500;
-    res.end("Database connection failed.");
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.end("Server error: database connection failed.");
   }
 };

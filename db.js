@@ -7,9 +7,9 @@ let initPromise;
 
 const initDatabase = () => {
   if (!connectionString) {
-    return Promise.reject(
-      new Error("Missing DATABASE_URL environment variable.")
-    );
+    const error = new Error("Missing DATABASE_URL environment variable.");
+    console.error(error.message);
+    return Promise.reject(error);
   }
 
   if (!initPromise) {
