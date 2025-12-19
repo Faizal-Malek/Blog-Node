@@ -5,6 +5,7 @@ const blogController = require("../controllers/blogController");
 router.get("/", blogController.blog_index);
 router.post("/", blogController.blog_create_post);
 router.get("/create", blogController.blog_create_get);
+router.post("/:id/like", blogController.blog_like_post);
 router.delete("/:id", blogController.blog_delete);
 router.get("/:id", blogController.blog_details);
 
