@@ -1,13 +1,19 @@
 const { Pool } = require("@neondatabase/serverless");
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString =
+  process.env.DATABASE_URL ||
+  process.env.BlogPost_DATABASE_URL ||
+  process.env.BlogPost_POSTGRES_URL ||
+  process.env.POSTGRES_URL;
 const pool = connectionString ? new Pool({ connectionString }) : null;
 
 let initPromise;
 
 const initDatabase = () => {
   if (!connectionString) {
-    const error = new Error("Missing DATABASE_URL environment variable.");
+    const error = new Error(
+      "Missing DATABASE_URL/BlogPost_DATABASE_URL/BlogPost_POSTGRES_URL/POSTGRES_URL environment variable."
+    );
     console.error(error.message);
     return Promise.reject(error);
   }
