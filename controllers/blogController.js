@@ -75,5 +75,6 @@ module.exports = {
   blog_details,
   blog_create_get,
   blog_create_post,
-  blog_delete
+  blog_delete,
+  blog_like_post
 };
