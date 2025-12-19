@@ -6,11 +6,13 @@
 
     <div class="details content">
       <h2><%= blog.title %></h2>
+      <p class="meta">Views: <span id="view-count"><%= stats.views %></span> · Likes: <span id="like-count"><%= stats.likes %></span></p>
       <div class="content">
         <p><%= blog.body %></p>
       </div>
-      <a data-doc="<%=blog._id %>" class="Update">Update</a>
-      <a data-doc="<%=blog._id %>" class="delete">Delete</a>
+      <button data-doc="<%=blog.id %>" class="like">Like</button>
+      <a data-doc="<%=blog.id %>" class="Update">Update</a>
+      <a data-doc="<%=blog.id %>" class="delete">Delete</a>
     </div>
 
     <script>
@@ -42,6 +44,26 @@
           .then((response) => response.json())
           .then((data) => {
             window.location.href = data.redirect;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+
+      const likeButton = document.querySelector("button.like");
+      const likeCount = document.querySelector("#like-count");
+      likeButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        const endpoint = `/blogs/${likeButton.dataset.doc}/like`;
+        fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            likeCount.textContent = data.likes;
           })
           .catch((err) => {
             console.log(err);

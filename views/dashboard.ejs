@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('./Partials/head.ejs') %>
+  <body>
+    <%- include('./Partials/nav.ejs') %>
+
+    <div class="content">
+      <h2>Dashboard</h2>
+      <div class="stats">
+        <div class="stat-card">
+          <h3>Total Posts</h3>
+          <p><%= stats.totalPosts %></p>
+        </div>
+        <div class="stat-card">
+          <h3>Total Views</h3>
+          <p><%= stats.totalViews %></p>
+        </div>
+        <div class="stat-card">
+          <h3>Total Likes</h3>
+          <p><%= stats.totalLikes %></p>
+        </div>
+      </div>
+
+      <h3>Top Posts</h3>
+      <ul class="top-posts">
+        <% if (topPosts.length === 0) { %>
+        <li>No posts yet.</li>
+        <% } %>
+        <% topPosts.forEach(post => { %>
+        <li>
+          <strong><%= post.title %></strong>
+          <span><%= post.views %> views</span>
+        </li>
+        <% }) %>
+      </ul>
+      <form action="/logout" method="POST">
+        <button>Log out</button>
+      </form>
+    </div>
+  </body>
+  <%- include('./Partials/footer.ejs') %>
+</html>
