@@ -14,10 +14,17 @@ if (!dbURI) {
   process.exit(1);
 }
 
-mongoose
-  .connect(dbURI)
-  .then(() => app.listen(port))
-  .catch((err) => console.error(err));
+const connectToDatabase = () =>
+  mongoose.connect(dbURI).catch((err) => {
+    console.error(err);
+    throw err;
+  });
+
+if (require.main === module) {
+  connectToDatabase()
+    .then(() => app.listen(port))
+    .catch(() => process.exit(1));
+}
 
 //register view engine
 app.set("view engine", "ejs");
@@ -48,3 +55,5 @@ app.use("/blogs", blogRoutes);
 app.use((req, res) => {
   res.status(404).render("404", { title: "404" });
 });
+
+module.exports = { app, connectToDatabase };
